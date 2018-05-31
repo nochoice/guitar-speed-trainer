@@ -7,9 +7,23 @@
         body {
             font-family: 'Inconsolata', monospace;
         }
+        .key {
+            display: inline-block;
+            width: 1em;
+            text-align: center;
+            position: relative;
+
+        }
+
+        .active {
+            background: #2e2e2e;
+            color: #fff;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
+<input type="range" max="1000" id="range">
     <script src="/main.bundle.js"></script>
 </body>
 </html>

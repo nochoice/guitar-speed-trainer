@@ -20,6 +20,7 @@ export class HtmlSceneRenderer implements SceneRenderer {
     }
 
     public add(graphics: Node, selector?: string) {
+        this.wrapper.innerHTML = '';
         this.wrapper.appendChild(graphics);
     }
 

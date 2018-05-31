@@ -1,29 +1,69 @@
 import {GuitarString} from "../../guitar/string";
 export class HtmlFretRenderer {
-    constructor(private strings: string[][]) {};
+    private nodesOfNotes;
+    private activeNotes = [];
 
-    public getGraphic(): any {
+    constructor(private strings:string[][]) {
+        console.log(strings)
+        this.nodesOfNotes = strings.map((string, index) => {
+            return string.map((key, indexKey) => {
+                let wrapper = document.createElement('span');
+                let textNode = document.createTextNode(key);
+
+                wrapper.classList.add('key');
+
+                wrapper.appendChild(textNode);
+                return wrapper
+            });
+        });
+    };
+
+    public getGraphic():any {
         return this.strings
             .map(this.generateString.bind(this))
-            .reduce((itt: Node, i: Node) => {
+            .reduce((itt:Node, i:Node) => {
                 itt.appendChild(i);
                 return itt;
             }, document.createElement('div'));
 
     }
 
-    private generateString(s: string[]) {
+    public setNoteActive(string, fret) {
+        this.activeNotes.push({string, fret});
+        this.nodesOfNotes[string][fret].classList.add('active')
+    }
+
+    public unActivateNotes() {
+        this.activeNotes.forEach(item => {
+            this.nodesOfNotes[item.string][item.fret].classList.remove('active')
+        })
+    }
+
+    private generateString(s:string[], indexString:number) {
         const str = document.createElement('div');
 
-         s.forEach(note => {
-                const noteElem = document.createElement('span');
-                // tslint:disable-next-line
-                const text = document.createTextNode('|---' + note.padEnd(4, '-'));
+        s.forEach((note, index) => {
+            const noteElem = document.createElement('span');
+            let prefix = '|---';
+            let sufix = '---';
 
-                noteElem.appendChild(text);
+            if (!index) {
+                prefix = '';
+                sufix = '|';
+            }
 
-                str.appendChild(noteElem);
-            });
+            if (index === s.length - 1) {
+                sufix += '||---';
+            }
+
+            let prefixNode = document.createTextNode(prefix);
+            let sufixNode = document.createTextNode(sufix);
+
+            noteElem.appendChild(prefixNode);
+            noteElem.appendChild(this.nodesOfNotes[indexString][index])
+            noteElem.appendChild(sufixNode);
+            str.appendChild(noteElem);
+        });
 
         return str;
     }
