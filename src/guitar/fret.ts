@@ -1,7 +1,7 @@
 import { Tone } from './tone';
 import {GuitarString} from "./string";
 export class GuitarFret {
-    private strings: any[] = [];
+    private strings: GuitarString[] = [];
 
     constructor() {}
 
