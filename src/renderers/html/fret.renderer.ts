@@ -4,7 +4,6 @@ export class HtmlFretRenderer {
     private activeNotes = [];
 
     constructor(private strings:string[][]) {
-        console.log(strings)
         this.nodesOfNotes = strings.map((string, index) => {
             return string.map((key, indexKey) => {
                 let wrapper = document.createElement('span');

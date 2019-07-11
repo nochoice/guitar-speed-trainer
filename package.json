@@ -12,16 +12,16 @@
   "author": "Roman Kora",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "7.0.0",
+    "@types/node": "12.6.2",
     "awesome-typescript-loader": "3.4.0",
     "source-map-loader": "0.2.3",
     "tslint": "5.8.0",
     "tslint-loader": "3.5.3",
-    "typescript": "2.6.1",
+    "typescript": "3.5.3",
     "webpack": "3.8.1",
     "webpack-dev-server": "2.9.4"
   },
   "dependencies": {
-    "rxjs": "^6.2.0"
+    "rxjs": "^6.5.2"
   }
 }

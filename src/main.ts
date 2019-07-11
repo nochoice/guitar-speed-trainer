@@ -1,12 +1,12 @@
 import {Observable, ReplaySubject, BehaviorSubject} from 'rxjs';
-import {take, map} from 'rxjs/operators';
+import {take, map, withLatestFrom, tap} from 'rxjs/operators';
 import {GuitarFret} from "./guitar/fret";
 import {HtmlSceneRenderer} from "./renderers/html/scene.renderer";
 import {HtmlFretRenderer} from "./renderers/html/fret.renderer";
-import { of, combineLatest, timer, interval} from 'rxjs';
+import { of, combineLatest, interval} from 'rxjs';
 import {switchMap} from "rxjs/internal/operators/switchMap";
 
-const BPM = 20;
+const BPM = 70;
 const FRET_SIZE = 12;
 const strings$ = new BehaviorSubject(['e','h', 'g', 'd', 'a', 'e']);
 const numOfFrets$ = new BehaviorSubject(FRET_SIZE);
@@ -27,7 +27,7 @@ document.getElementById('range').addEventListener('input', (e) => {
 const scene = new HtmlSceneRenderer();
 scene.render();
 
-const fretHTML$ = fret$
+const fretHTML$: Observable<HtmlFretRenderer> = fret$
     .pipe(
         map(n => new HtmlFretRenderer(n)),
         map(guitar => {
@@ -40,29 +40,13 @@ const interval$ = BPM$.pipe(
     switchMap(bpm => interval(60000/bpm))
 );
 
-combineLatest(interval$, fretHTML$)
-    .pipe(
-        map(([_, guitar]) => {
-            guitar.unActivateNotes();
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-            guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
-        })
-    )
-    .subscribe()
-
-// guitar.setNoteActive(5, 0);
-// guitar.setNoteActive(0, 2);
-// guitar.setNoteActive(1, 2);
-// guitar.setNoteActive(2, 2);
-// guitar.setNoteActive(4, 5);
-
+interval$.pipe(
+    withLatestFrom(fretHTML$),
+    tap(([_, guitar]) => {
+        guitar.unActivateNotes();
+        guitar.setNoteActive(Math.floor(Math.random()*6), Math.floor(Math.random()*FRET_SIZE));
+    })
+)
+.subscribe();
 
 

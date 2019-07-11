@@ -10,8 +10,6 @@ export class GuitarString {
             let note = NOTES[index];
             this.step.push(note);
         }
-
-        // console.log(this.step);
     }
 
     public get(): string[] {
