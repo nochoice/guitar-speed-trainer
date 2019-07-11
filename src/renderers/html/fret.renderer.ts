@@ -40,7 +40,9 @@ export class HtmlFretRenderer {
     public unActivateNotes() {
         this.activeNotes.forEach(item => {
             this.nodesOfNotes[item.string][item.fret].classList.remove('active')
-        })
+        });
+
+        this.activeNotes.length = 0;
     }
 
     private generateString(s:string[], indexString:number) {

@@ -1,19 +1,55 @@
-import {Observable, ReplaySubject, BehaviorSubject} from 'rxjs';
-import {map, withLatestFrom, tap, share, publish} from 'rxjs/operators';
+import {Observable, BehaviorSubject} from 'rxjs';
+import {map, withLatestFrom, share} from 'rxjs/operators';
 import {GuitarFret} from "./guitar/fret";
 import {HtmlSceneRenderer} from "./renderers/html/scene.renderer";
 import {HtmlFretRenderer} from "./renderers/html/fret.renderer";
-import { of, combineLatest, interval} from 'rxjs';
+import {combineLatest, interval} from 'rxjs';
 import {switchMap} from "rxjs/internal/operators/switchMap";
-import { Tone } from './guitar/tone';
+import {Tone} from './guitar/tone';
 
-const BPM = 70;
+const partDuplicate = (part) => {
+    return [...part, ...part];
+}
+
+const partReverse = (part) => {
+    return [...part].reverse();
+}
+
+const partShift = (part, num) => {
+    return part.map(item => {
+        let o = [...item];
+        o[1] = o[1] + num;
+        return o;
+    });
+}
+
+const BPM = 400;
 const FRET_SIZE = 12;
-const part = [
-    [0,0], [0,1], [0,3],
-    [1,0], [1,1], [0,2], [1,2], [1,3],
-    [1,0], [4,1], [1,2], [1,3],
+
+let part = [
+    [5,1], [5,2], [5,3], [5,4],
+    [4,1], [4,2], [4,3], [4,4],
+    [3,1], [3,2], [3,3], [3,4],
+    [2,1], [2,2], [2,3], [2,4],
+    [1,1], [1,2], [1,3], [1,4],
+    [0,1], [0,2], [0,3], [0,4]
 ];
+
+part = [
+    [5,1], 
+    [4,2], 
+    [3,3], 
+    [2,4],
+    [1,1],
+    [0,2],
+];
+
+const rev = [...part].reverse();
+// part = partReverse(part);
+// part = partDuplicate(part);
+part = [...part, ...partShift(part, 5), ...partShift(part, 1), ...partShift(part, 6), ...partShift(part, 2)];
+part = [...part, ...partReverse(part)];
+
 
 const strings = [
     new Tone('e', 4),
@@ -65,7 +101,10 @@ const app$ = interval$.pipe(
     share()
 );
 
+
 app$.subscribe(([_, guitar, strings, part]) => {
+    console.log('tick');
+
     guitar.unActivateNotes();
     guitar.setNoteActive(part[_%part.length][0], part[_%part.length][1]);
 });
