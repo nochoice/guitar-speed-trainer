@@ -1,8 +1,9 @@
+import { GuitarTone } from './guitar-tone';
 import { Tone } from './tone';
 import {NOTES} from "../constants";
 
 export class GuitarString {
-    private step: Tone[] = [];
+    private step: GuitarTone[] = [];
 
     constructor(private tone: Tone, private num: number) {
         const indexOfNote = NOTES.indexOf(tone.key);
@@ -10,16 +11,21 @@ export class GuitarString {
 
         for (let i=0; i<num; i++) {
             
-            if (i+indexOfNote === NOTES.length)  {
-                octave++;
-            }
-            let index = (i+indexOfNote) % NOTES.length;
-            let key = NOTES[index];
-            this.step.push(new Tone(key, octave));
+            octave = (i+indexOfNote === NOTES.length) ? octave++ : octave;
+            // if (i+indexOfNote === NOTES.length)  {
+            //     octave++;
+            // }
+
+            const index = (i+indexOfNote) % NOTES.length;
+            const key = NOTES[index];
+            const gt = new GuitarTone(new Tone(key, octave));
+
+            gt.position = [0, i];
+            this.step.push(gt);
         }
     }
 
-    public get(): Tone[] {
+    public get(): GuitarTone[] {
         return this.step;
     }
 }

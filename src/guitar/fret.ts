@@ -1,3 +1,4 @@
+import { GuitarTone } from './guitar-tone';
 import { Tone } from './tone';
 import {GuitarString} from "./string";
 export class GuitarFret {
@@ -10,7 +11,7 @@ export class GuitarFret {
         return this;
     }
 
-    public transform(): Array<Array<Tone>> {
+    public transform(): Array<Array<GuitarTone>> {
         return this.strings.map((s: GuitarString) => s.get());
     }
 }

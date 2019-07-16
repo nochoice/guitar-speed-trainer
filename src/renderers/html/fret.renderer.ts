@@ -1,14 +1,15 @@
+import { GuitarTone } from './../../guitar/guitar-tone';
 import { Tone } from './../../guitar/tone';
 
 export class HtmlFretRenderer {
     private nodesOfNotes;
     private activeNotes = [];
 
-    constructor(private strings:Tone[][]) {
-        this.nodesOfNotes = strings.map((string: Tone[]) => {
-            return string.map((tone: Tone) => {
+    constructor(private strings:GuitarTone[][]) {
+        this.nodesOfNotes = strings.map((string: GuitarTone[]) => {
+            return string.map((tone: GuitarTone) => {
                 const wrapper = document.createElement('span');
-                const textNode = document.createTextNode(tone.key);
+                const textNode = document.createTextNode(tone.tone.key);
 
                 wrapper.classList.add('key');
                 wrapper.appendChild(textNode);
