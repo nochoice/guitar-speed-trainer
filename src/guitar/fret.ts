@@ -13,5 +13,4 @@ export class GuitarFret {
     public transform(): Array<Array<Tone>> {
         return this.strings.map((s: GuitarString) => s.get());
     }
-
 }
