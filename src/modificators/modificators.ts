@@ -8,3 +8,14 @@ export const partShift = (part, num) => {
         return o;
     });
 }
+
+export const partShiftVertical = (part, num) => {
+    return part.map(item => {
+        let o = [...item];
+        o[0] = o[0] + num;
+
+        console.log(o);
+
+        return o;
+    });
+}

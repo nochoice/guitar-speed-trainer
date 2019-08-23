@@ -1,47 +1,28 @@
-import {Observable, BehaviorSubject, combineLatest, interval} from 'rxjs';
+import {Observable, BehaviorSubject, combineLatest, interval, NEVER} from 'rxjs';
 import {map, withLatestFrom, share} from 'rxjs/operators';
 import {GuitarFret} from "./guitar/fret";
 import {HtmlSceneRenderer} from "./renderers/html/scene.renderer";
 import {HtmlFretRenderer} from "./renderers/html/fret.renderer";
 import {switchMap} from "rxjs/internal/operators/switchMap";
 import {Tone} from './guitar/tone';
-import { partShift, partReverse } from './modificators/modificators';
+import { partShift, partReverse, partShiftVertical } from './modificators/modificators';
 
 const BPM = 400;
-const FRET_SIZE = 12;
+const FRET_SIZE = 20;
 
 let part = [
-    [5,1], [5,2], [5,3], [5,4],
-    // [4,1], [4,2], [4,3], [4,4],
-    // [3,1], [3,2], [3,3], [3,4],
-    // [2,1], [2,2], [2,3], [2,4],
-    // [1,1], [1,2], [1,3], [1,4],
-    // [0,1], [0,2], [0,3], [0,4]
+    [5,1], [2,5], [1,1]
 ];
 
-// part = [
-//     [5,1], 
-//     [4,2], 
-//     [3,3], 
-//     [2,4],
-//     [4,2], 
-//     [3,3], 
-//     [2,4],
-//     [1,1],
-//     [0,2],
-//     [5,1], 
-//     [4,2], 
-//     [3,3], 
-//     [2,4],
-//     [4,2], 
-//     [3,3], 
-//     [2,4],
-//     [1,1],
-//     [0,2]
-// ];
+let part2 = [
+    [1,1], [2,1], [3,1]
+];
+
+part2 = [...part2, ...partShiftVertical(part2, 1)];
+part2 = [...part2, ...partShift(part2, 5)];
 
 part = [...part, ...partShift(part, 5), ...partShift(part, 1), ...partShift(part, 6), ...partShift(part, 2)];
-part = [...part, ...partReverse(part)];
+// part = [...part, ...partReverse(part)];
 
 const strings = [
     new Tone('e', 4),
@@ -53,10 +34,12 @@ const strings = [
 ];
 
 const strings$ = new BehaviorSubject(strings);
-const part$ = new BehaviorSubject(part);
+const part$ = new BehaviorSubject(part2);
 const numOfFrets$ = new BehaviorSubject(FRET_SIZE);
 const BPM$ = new BehaviorSubject(BPM);
-const isRunning$ = new BehaviorSubject(false); 
+
+let isRunning = true; 
+const isRunning$ = new BehaviorSubject(isRunning); 
 
 const fret$ = combineLatest(strings$, numOfFrets$)
     .pipe(
@@ -69,6 +52,13 @@ document.getElementById('range').addEventListener('input', (e) => {
 
     BPM$.next(parseInt(val, 10));
 });
+
+document.getElementById('start-stop').addEventListener('click', (e) => {
+    isRunning = !isRunning;
+    isRunning$.next(isRunning);
+    part$.next(part2);
+});
+
 
 (<any>document.getElementById('range')).value = BPM;
 
@@ -88,7 +78,12 @@ const interval$ = BPM$.pipe(
     switchMap(bpm => interval(60000/bpm))
 );
 
-const app$ = interval$.pipe(
+const run$ = isRunning$.pipe(
+    switchMap(isRunning => isRunning ? interval$ : NEVER)
+);
+
+
+const app$ = run$.pipe(
     withLatestFrom(fretHTML$, strings$, part$),
     share()
 );
@@ -98,6 +93,9 @@ app$.subscribe(([_, guitar, strings, part]) => {
     guitar.setNoteActive(part[_%part.length][0], part[_%part.length][1]);
 });
 
+// app$.subscribe(data => {
+//     console.log(data);
+// })
 // app$.subscribe(data => {
 //     console.log(data);
 // })
